@@ -2,26 +2,38 @@ const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
 const noteRoute = require("./routes/note.route.js");
+const cors = require("cors");
+const dotenv = require("dotenv");
+
+dotenv.config();
+
+const PORT = process.env.PORT;
 
 //middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+app.use(
+  cors({
+    origin: "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+  })
+);
+
 // routes
 app.use("/api/notes", noteRoute);
 
 app.get("/", (req, res) => {
-  res.send("Hello from Node API Server Updated");
+  res.send("Node API Server Updated");
 });
 
 mongoose
-  .connect(
-    "mongodb+srv://admin:WmuzxNhozikxUVgp@backenddb.91beg.mongodb.net/Node-API?retryWrites=true&w=majority&appName=BackendDB"
-  )
+  .connect(process.env.MONGO_CONNECTION_STRING)
   .then(() => {
     console.log("Connected to database!");
-    app.listen(3000, () => {
-      console.log("Server is running on port 3000");
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}` );
     });
   })
   .catch(() => {
